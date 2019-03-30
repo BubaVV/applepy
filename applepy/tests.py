@@ -1,5 +1,5 @@
 import unittest
-from cpu6502 import Memory, CPU
+from applepy.cpu6502 import Memory, CPU
 
 
 class TestMemory(unittest.TestCase):
@@ -330,7 +330,7 @@ class TestArithmeticOperations(unittest.TestCase):
 
     def test_ADC_without_BCD(self):
 
-        ## test cases from http://www.6502.org/tutorials/vflag.html
+        # test cases from http://www.6502.org/tutorials/vflag.html
 
         # 1 + 1 = 2  (C = 0; V = 0)
         self.cpu.carry_flag = 0
@@ -392,7 +392,7 @@ class TestArithmeticOperations(unittest.TestCase):
         self.assertEqual(self.cpu.carry_flag, 0)
         self.assertEqual(self.cpu.overflow_flag, 0)  # @@@
 
-        ## test cases from http://www.6502.org/tutorials/vflag.html
+        # test cases from http://www.6502.org/tutorials/vflag.html
 
         # 0 - 1 = -1  (V = 0)
         self.cpu.carry_flag = 1
@@ -430,7 +430,7 @@ class TestArithmeticOperations(unittest.TestCase):
         self.assertEqual(self.cpu.carry_flag, 1)
         self.assertEqual(self.cpu.overflow_flag, 1)  # @@@
 
-    ## @@@ BCD versions still to do
+    # @@@ BCD versions still to do
 
     def test_CMP(self):
         self.cpu.accumulator = 0x0A
