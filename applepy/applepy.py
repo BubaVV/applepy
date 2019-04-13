@@ -330,7 +330,7 @@ class SoftSwitches:
         self.cassette = cassette
 
     def read_byte(self, cycle, address):
-        assert 0xC000 <= address <= 0xCFFF
+        assert 0xC000 <= address <= 0xCFFF  # TODO: remove asserts
         if address == 0xC000:
             return self.kbd
         elif address == 0xC010:
@@ -415,7 +415,7 @@ class Apple2:
                     quit = True
 
                 if event.type == pygame.KEYDOWN:
-                    key = ord(event.str) if event.str else 0
+                    key = getattr(event, 'key', 0)
                     if event.key == pygame.K_LEFT:
                         key = 0x08
                     if event.key == pygame.K_RIGHT:

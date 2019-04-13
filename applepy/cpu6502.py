@@ -1,9 +1,8 @@
 # ApplePy - an Apple ][ emulator in Python
 # James Tauber / http://jtauber.com/
 # originally written 2001, updated 2011
+from __future__ import print_function
 
-
-import http.server
 import json
 import re
 import select
@@ -11,6 +10,12 @@ import socket
 import struct
 import sys
 
+if sys.version_info.major > 2:
+    from http.server import BaseHTTPRequestHandler
+    from http.server import HTTPServer
+else:
+    from BaseHTTPServer import BaseHTTPRequestHandler
+    from BaseHTTPServer import HTTPServer
 
 bus = None  # socket for bus I/O
 
@@ -34,11 +39,15 @@ class ROM:
 
     def load_file(self, address, filename):
         with open(filename, "rb") as f:
-            for offset, datum in enumerate(f.read()):
-                self._mem[address - self.start + offset] = datum
+            if sys.version_info.major > 2:
+                for offset, datum in enumerate(f.read()):
+                    self._mem[address - self.start + offset] = datum
+            else:
+                for offset, datum in enumerate(f.read()):
+                    self._mem[address - self.start + offset] = ord(datum)
 
     def read_byte(self, address):
-        assert self.start <= address <= self.end
+        assert self.start <= address <= self.end  # TODO: assert is bad in prod
         return self._mem[address - self.start]
 
 
@@ -365,7 +374,7 @@ class Disassemble:
         return r, info[0]
 
 
-class ControlHandler(http.server.BaseHTTPRequestHandler):
+class ControlHandler(BaseHTTPRequestHandler):
 
     def __init__(self, request, client_address, server, cpu):
         self.cpu = cpu
@@ -385,7 +394,7 @@ class ControlHandler(http.server.BaseHTTPRequestHandler):
             r"/reset$": self.post_reset,
         }
 
-        http.server.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+        BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 
     def log_request(self, code, size=0):
         pass
@@ -508,7 +517,7 @@ class CPU:
     def __init__(self, options, memory):
         self.memory = memory
 
-        self.control_server = http.server.HTTPServer(("127.0.0.1", 6502), ControlHandlerFactory(self))
+        self.control_server = HTTPServer(("127.0.0.1", 6502), ControlHandlerFactory(self))
 
         self.accumulator = 0x00
         self.x_index = 0x00
